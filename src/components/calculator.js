@@ -1,14 +1,14 @@
-import React, { Component } from "react";
-import Display from "./display";
-import styles from "./calculator.module.css";
-import Buttons from "./buttons";
-import validInput from "./validationInput";
+import React, { Component } from 'react';
+import Display from './display';
+import styles from './calculator.module.css';
+import Buttons from './buttons';
+import validInput from './validationInput';
 
 export default class Calculator extends Component {
   state = {
     sums: [],
-    total: "0",
-    display: "0",
+    total: '0',
+    display: '0',
   };
 
   updateSums(userInput) {
@@ -28,17 +28,19 @@ export default class Calculator extends Component {
     this.setState((prevState) => {
       return {
         ...prevState,
-        display: "",
+        display: '',
       };
     });
   }
 
   getTotal() {
     this.setState((prevState) => {
-      console.log(prevState);
       //he here i get the prevState and pass it to the final calculation function
       let results = this.finalCalculation(prevState.sums);
-      results = results.toString();
+      results = results.toString().includes('.')
+        ? results.toFixed(2)
+        : results.toString();
+
       return {
         ...prevState,
         total: results,
@@ -50,15 +52,15 @@ export default class Calculator extends Component {
 
   resetDisplay() {
     this.setState({
-      total: "0",
-      display: "0",
+      total: '0',
+      display: '0',
       sums: [],
     });
   }
 
   updateDisplay = (input) => {
     this.setState((prevState) => {
-      if (prevState.total !== "0") {
+      if (prevState.total !== '0') {
         return {
           ...prevState,
           sums: [prevState.total, input],
@@ -79,18 +81,21 @@ export default class Calculator extends Component {
     }
     let userInput = e.target.textContent;
     switch (userInput) {
-      case "=":
-        this.updateSums("=");
-        this.clearDisplay();
-        this.getTotal();
+      case '=':
+        if (this.state.sums.length > 1) {
+          this.updateSums('=');
+          this.clearDisplay();
+          this.getTotal();
+          return;
+        }
         return;
 
-      case ".":
+      case '.':
         e.persist();
         return this.setState((prevState) => {
           if (
             prevState.sums.length > 1 &&
-            ["x", "/", "+"].includes(prevState.display) === true
+            ['x', '/', '+'].includes(prevState.display) === true
           ) {
             return {
               display: e.target.textContent,
@@ -102,21 +107,21 @@ export default class Calculator extends Component {
           }
         });
 
-      case "ac":
+      case 'ac':
         return this.resetDisplay();
 
-      case "+":
-        this.updateSums("+");
+      case '+':
+        this.updateSums('+');
         this.clearDisplay();
-        return this.updateDisplay("+");
+        return this.updateDisplay('+');
 
-      case "-":
+      case '-':
         // This is check if an operator io already in the array and if so then it will clear this operator and return the - into the display, if not it will add the number to the calculation
         e.persist();
         return this.setState((prevState) => {
-          if (["+", "x", "/"].includes(prevState.display)) {
+          if (['+', 'x', '/'].includes(prevState.display)) {
             this.clearDisplay();
-            this.updateDisplay("-");
+            this.updateDisplay('-');
           } else {
             return {
               ...prevState,
@@ -126,26 +131,26 @@ export default class Calculator extends Component {
           }
         });
 
-      case "x":
-        this.updateSums("x");
+      case 'x':
+        this.updateSums('x');
         this.clearDisplay();
-        return this.updateDisplay("x");
+        return this.updateDisplay('x');
 
-      case "/":
-        this.updateSums("/");
+      case '/':
+        this.updateSums('/');
         this.clearDisplay();
-        return this.updateDisplay("/");
+        return this.updateDisplay('/');
 
       default:
         // as I need to use the event within the callback I need to use e.persist so I can use it in there.
         e.persist();
         return this.setState((prevState) => {
           if (
-            (["-"].includes(prevState.display) &&
-              ["/", "x", "+"].includes(
+            (['-'].includes(prevState.display) &&
+              ['/', 'x', '+'].includes(
                 prevState.sums[prevState.sums.length - 1]
               )) ||
-            ["/", "x", "+", "-", "0"].includes(prevState.display) === false
+            ['/', 'x', '+', '-', '0'].includes(prevState.display) === false
           ) {
             return { display: prevState.display + e.target.textContent };
           } else {
@@ -168,22 +173,22 @@ export default class Calculator extends Component {
       const number2 = Number(sumArrayCalc[2]);
       const operator = sumArrayCalc[1];
 
-      if (operator === "x") {
+      if (operator === 'x') {
         finalCalc = number1;
         finalCalc = finalCalc * number2;
       }
 
-      if (operator === "+") {
+      if (operator === '+') {
         finalCalc = number1;
         finalCalc = finalCalc + number2;
       }
 
-      if (operator === "-") {
+      if (operator === '-') {
         finalCalc = number1;
         finalCalc = finalCalc - number2;
       }
 
-      if (operator === "/") {
+      if (operator === '/') {
         finalCalc = number1;
         finalCalc = finalCalc / number2;
       }
